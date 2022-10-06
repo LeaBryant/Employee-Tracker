@@ -1,72 +1,156 @@
-const { employeeQuestions, managerQuestion, engineerQuestion, internQuestion, menuQuestion } = require('./src/questions');
 const inquirer = require("inquirer");
-const Manager = require('./lib/Manager');
-const Employee = require('./lib/Employee');
-const Intern = require('./lib/Intern');
-const Engineer = require('./lib/Engineer');
-const fs = require('fs');
-const generateHTML = require('./src/generateHTML');
+require("console.table");
+const db = require('./db')
 
-let team = [];
-
-const menu = () => {
-    inquirer.prompt(menuQuestion)
-    .then(data => {
-        if(data.nextStep ==='Enter an engineer.') {
-            engineer();
-        }
-        else if (data.nextStep ==='Enter an intern.') {
-                intern();
-            }
-        else {
-            writeToFile(team);
-        }
-    });
+const mainMenu = {
+    type: "list",
+    message: "What do you want to do?",
+    name: "action",
+    choices: [
+        "View Roles",
+        "View Departments",
+        "View Employees",
+        "Add a Role",
+        "Add a Department",
+        "Add an Employee",
+        "Update an existing role",
+        "exit",
+    ],
 }
 
-const writeToFile = (data)=> {
-    return new Promise((resolve, reject) => {
-        fs.writeFile('./dist/index.html', generateHTML(data), err => {
-          if (err) {
-            reject(err);
-            return;
-          }
-          resolve({
-            ok: true,
-            message: 'File created!'
-          });
-        });
-      });
-    };
+const roleMenu = [
+    {
+        type: "input",
+        message: "What is the Role?",
+        name: "role",
+    },
+    {
+        type: "input",
+        message: "What is the Salery for this Role?",
+        name: "salary",
+    },
+    {
+        type: "input",
+        message: "In what Department does this Role go?",
+        name: "department",
+    }
+]
 
-const init = () => {
-    const managerArray = managerQuestion.concat(employeeQuestions); 
-    inquirer.prompt(managerArray)
-    .then(data => {
-        const manager = new Manager (data.name, data.employeeID, data.email, data.officeNumber);
-        team.push(manager);
-        menu();
-    }) 
+const departmentMenu = {
+    type: "input",
+    message: "What department would you like to Add?",
+    name: "newDepartment",
 }
 
-const intern = () => {
-    const internArray = internQuestion.concat(employeeQuestions); 
-    inquirer.prompt(internArray)
-    .then(data => {
-        const intern = new Intern (data.name, data.employeeID, data.email, data.school);
-        team.push(intern);
-        menu();
+const employeeMenu = [
+    {
+        type: "input",
+        message: "Employee First Name?",
+        name: "firstName",
+    },
+    {
+        type: "input",
+        message: "Employee Last Name?",
+        name: "lastName",
+    },
+    {
+        type: "input",
+        message: "Employee Role?",
+        name: "role",
+    },
+    {
+        type: "input",
+        message: "Employee Manager?",
+        name: "manager",
+    }
+]
+
+const updateEmp = [
+    {
+        type: "input",
+        message: "Choose an Employee",
+        name: "updateEmployee",
+    },
+    {
+        type: "input",
+        message: "Choose a new role for Employee",
+        name: "updateRole",
+    },
+]
+
+// const updateRole = [
+
+// ]
+// viewRoles(){
+//     db.query('SELECT * FROM empRole', function (err, results) {
+//         console.log(results);
+//       });
+// }
+
+// viewDepartment(){
+//     db.query('SELECT * FROM department', function (err, results) {
+//         console.log(results);
+//       });
+// }
+// viewEmployees(){
+//     db.query('SELECT * FROM employee', function (err, results) {
+//         console.log(results);
+//       });
+// }
+
+function menu()
+{
+    inquirer.prompt(mainMenu).then((answer) => {
+        switch (answer.action){
+            case "View Roles":
+                viewRoles()
+                break;
+            case "View Departments":
+                viewDepartment()
+                break;
+            case "View Employees":
+                viewEmployees()
+                break;
+            case "Add a Role":
+                inquirer.prompt(roleMenu).then((answers) => {
+                    //code to add to database
+                    menu()
+                })
+                break;
+            case "Add a Department":
+                inquirer.prompt(departmentMenu).then((answers) => {
+                    //code to add to database
+                    menu()
+                })
+                break;
+            case "Add an Employee":
+                inquirer.prompt(employeeMenu).then((answers) => {
+                    //code to add to database
+                    menu()
+                })
+                break;
+                default: process.exit();
+        }
     })
 }
 
-const engineer = () => {
-    const engineerArray = engineerQuestion.concat(employeeQuestions); 
-    inquirer.prompt(engineerArray)
-    .then(data => {
-        const engineer = new Engineer (data.name, data.employeeID, data.email, data.gitHubUsername);
-        team.push(engineer);
-        menu();
-    })
+function viewRoles(){
+    db.findAllRoles().then(([data]) =>{
+        console.table(data)
+    }).then(() => menu())
 }
 
-let manager = init();
+function viewDepartment(){
+    db.findAllDepartments().then(([data]) =>{
+        console.table(data)
+    }).then(() => menu())
+}
+
+function viewEmployees(){
+    db.findAllEmployees().then(([data]) =>{
+        console.table(data)
+    }).then(() => menu())
+}
+
+
+menu()
