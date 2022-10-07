@@ -1,30 +1,30 @@
-USE employees;
-
-INSERT INTO department (name)
+INSERT INTO department (department_name)
 VALUES 
-    ("Engineering"),
-    ("Product Design"),
-    ("Support"),
     ("Sales"),
-    ("Finance");
+    ("Engineering"),
+    ("Finance"),
+    ("Legal");
 
-INSERT INTO role (title, salary, department_id)
-VALUES
-    ("Frontend Engineer", 150000, 1),
-    ("Backend Engineer", 150000, 1),
-    ("Product Manager", 130000, 2),
-    ("Support Specialist", 100000, 3),
-    ("Account Executive", 100000, 4),
-    ("Sales Engineer", 120000, 4),
-    ("Accounts Receivable", 140000, 5);
+INSERT INTO employee_role (title, salary, department_id)
+VALUES 
+    ("Sales Lead", 100000, 1),
+    ("Salesperson", 80000, 1),
+    ("Lead Engineer", 150000, 2),
+    ("Software Engineer", 120000, 2),
+    ("Account Manager", 160000, 3),
+    ("Accountant", 125000, 3),
+    ("Legal Team Lead", 250000, 4),
+    ("Lawyer", 190000, 4);
+
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES 
-    ("Patrick", "Lago", 1, 1),
-    ("Stephen", "Curry", 2, 2),
-    ("Klay", "Thompson", 3, null),
-    ("Draymond", "Green", 4, 3),
-    ("Steve", "Kerr", 5, 2),
-    ("James", "Wiseman", 6, null),
-    ("Andrew", "Wiggins", 7, 4),
-    ("Kevon", "Looney", 5, 2);
+    ("John", "Doe", 1, null),
+    ("Jordan", "Doe", 2, 1),
+    ("Step", "Curry", 3, null),
+    ("Lea", "Bryant", 4, 3),
+    ("Will", "Smith", 5, null),
+    ("Hank", "Williams", 6, 5),
+    ("Toby", "Keith", 7, null),
+    ("Drake", "Kelly", 8, 7);
+       
