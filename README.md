@@ -21,6 +21,13 @@ This App takes the information about employees profile team and generates an HTM
 
 
 ## Installation
+Steps to run application:
+
+Command prompt:
+1. mysql -u root -p
+2. Enter password
+3. source db/schema.sql
+4. source d/seed.sql (optional)
 
 Install [Node.js](https://nodejs.org/en/) JavaScript runtime and [npm package manager](https://www.npmjs.com/) are installed.
 

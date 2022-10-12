@@ -7,9 +7,7 @@ const db = mysql.createConnection({
     host: "localhost",
     user: "root",
     database: "employees_db",
-    // PW different on windows
     password: "Danitra1234",
-    // needed for mac only
     port: "/tmp/mysql.sock",
 });
 
@@ -20,11 +18,10 @@ var rolesIdsArray = [];
 var employeesArray = [];
 var employeeIdsArray = [];
 
-const startMenu = () => {
-    //Grab the data from the sql tables so we can put it in arrays to use later (as their choices and then writing it to the tables)
-    getDepts();
+const startList = () => {
+    getDepartments();
     getRoles();
-    getemployees();
+    getEmployees();
     inquirer
         .prompt([
             {
@@ -32,14 +29,14 @@ const startMenu = () => {
                 name: "initial_selection",
                 message: "Choose from the following options:",
                 choices: [
-                    "View all departments",
-                    "View all roles",
-                    "View all employees",
-                    "Add a department",
-                    "Add a role",
-                    "Add an employee",
-                    "Update an employee role",
-                    "Quit",
+                    "List all Departments",
+                    "List all Roles",
+                    "List all Employees",
+                    "Add a Department",
+                    "Add a Role",
+                    "Add an Employee",
+                    "Update a Employee",
+                    "Exit",
                 ],
             },
         ])
@@ -54,16 +51,16 @@ const startMenu = () => {
                 viewEmployees();
             }
             if (answers.initial_selection == "Add a department") {
-                promptDeptName();
+                promptDName();
             }
             if (answers.initial_selection == "Add a role") {
-                promptRoleName();
+                promptRName();
             }
             if (answers.initial_selection == "Add an employee") {
-                promptEmployeeName();
+                promptEName();
             }
             if (answers.initial_selection == "Update an employee role") {
-                promptNewEmployeeRole();
+                promptNewERole();
             }
             if (answers.initial_selection == "Quit") {
                 console.log("Thank you for using this application.");
@@ -71,7 +68,7 @@ const startMenu = () => {
         });
 };
 
-const getDepts = () => {
+const getDepartments = () => {
     db.query("SELECT id, department_name FROM departments", function (err,res) {
         res.forEach((item) => {
             departmentsArray.push(item.department_name);
@@ -103,7 +100,7 @@ const getRoles = () => {
     });
 }
 
-const getemployees = () => {
+const getEmployees = () => {
     db.query(
         "SELECT id, first_name, last_name FROM employees",
         function (err, res) {
@@ -134,7 +131,7 @@ const viewDepts = () => {
         `,
         function (err, results) {
             console.table(results);
-            startMenu();
+            startList();
         }
     );
 };
@@ -149,7 +146,7 @@ const viewRoles = () => {
     `,
         function (err, results) {
             console.table(results);
-            startMenu();
+            startList();
         }
     );
 };
@@ -168,25 +165,24 @@ const viewEmployees = () => {
     `,
         function (err, results) {
             console.table(results);
-            startMenu();
+            startList();
         }
     );
 };
 
-//To add a department, functions promptDeptName and addDepartment to ask input questions and write to table
-const promptDeptName = () => {
+const promptDName = () => {
     inquirer
         .prompt([
             {
                 type: "input",
                 name: "deptName",
-                message: "What is the department's name?",
+                message: "Enter the department's name?",
             },
         ])
         .then((answers) => {
             addDepartment(answers.deptName);
 
-            console.log("You've added a department named " + answers.deptName + ".");
+            console.log("Department name added " + answers.deptName + ".");
         });
 };
 
@@ -205,29 +201,29 @@ const addDepartment = (deptName) => {
     `,
         function (err, results) {
             console.table(results);
-            startMenu();
+            startList();
         }
     );
 };
 
 //To add a role, functions promptRoleName and addRole to ask input questions and write to table
-const promptRoleName = () => {
+const promptRName = () => {
     inquirer
         .prompt([
             {
                 type: "input",
                 name: "roleTitle",
-                message: "What is the job role's title?",
+                message: "Enter the role's title?",
             },
             {
                 type: "input",
                 name: "roleSalary",
-                message: "What is the job role's salary?",
+                message: "Enter role's salary?",
             },
             {
                 type: "list",
                 name: "roleDepartment",
-                message: "What is the job role's department?",
+                message: "Enter role's department?",
                 choices: departmentsArray
             },
         ])
@@ -270,35 +266,34 @@ const addRole = (roleTitle, roleSalary, roleDepartment) => {
     `,
         function (err, results) {
             console.table(results);
-            startMenu();
+            startList();
         }
     );
 };
 
-//To add an employee, functions promptEmployeeName and addEmployee to ask input questions and write to table
-const promptEmployeeName = () => {
+const promptEName = () => {
     inquirer
         .prompt([
             {
                 type: "input",
                 name: "employeeFirstName",
-                message: "What is the employee's first name?",
+                message: "Enter employee's first name?",
             },
             {
                 type: "input",
                 name: "employeeLastName",
-                message: "What is the employee's last name?",
+                message: "Enter employee's last name?",
             },
             {
                 type: "list",
                 name: "employeeRole",
-                message: "What is the employee's job role?",
+                message: "Enter employee's job role?",
                 choices: rolesArray
             },
             {
                 type: "list",
                 name: "employeeManager",
-                message: "Who is the employee's manager?",
+                message: "Enter employee's manager?",
                 choices: employeesArray
             },
         ])
@@ -311,7 +306,6 @@ const promptEmployeeName = () => {
                 }
             });
 
-            // Manager name options converted to integer
             var managerNum;
             employeeIdsArray.forEach((item) => {
                 if (answers.employeeManager === item.totalName) {
@@ -366,13 +360,12 @@ const addEmployee = (
     `,
         function (err, results) {
             console.table(results);
-            startMenu();
+            startList();
         }
     );
 };
 
-//To update an employee job role, functions promptNewEmployeeRole and updateEmployeeRole to ask input questions and write to table
-const promptNewEmployeeRole = () => {
+const promptNewERole = () => {
     inquirer
         .prompt([
             {
@@ -389,9 +382,6 @@ const promptNewEmployeeRole = () => {
             }
         ])
         .then((answers) => {
-            // Employee role options converted to integer.
-            //We have to convert the full name to an id number because the table doesn't have a full name. Just a first name and then last name cololmn.
-            //We have to convert the employee role name to a number because the table uses a number not a name. 
             var employeeId;
             employeeIdsArray.forEach((item) => {
             if (answers.employeeName === item.totalName) {
@@ -445,9 +435,9 @@ const updateEmployeeRole = (employeeId, roleNum) => {
     `,
         function (err, results) {
             console.table(results);
-            startMenu();
+            startList();
         }
     );
 }
 
-startMenu();
+startList();
